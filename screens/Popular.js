@@ -15,18 +15,36 @@ export default class PopularScreen extends Component {
     super(props);
     this.state = {
       data: [],
-      ngrok_url:""
+      ngrok_url:"https://74c0-2804-d59-bf46-bf00-9596-4d3e-56eb-df01.ngrok.io"
     };
   }
 
+  componentDidMount() {
+    this.getData();
+  }
+
   getData = () => {
-     /*Complete a função getData().*/
-
-
+    const url = this.state.ngrok_url+"/popular-articles";
+    axios
+      .get(url)
+      .then(async (response) => {
+        this.setState({ data: response.data.data });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
-  /*Escreva as funções keyExtractor() e renderItems() para a FlatList*/
+  keyExtractor = (item, index) => index.toString();
 
+  renderItems = ({ item, index }) => {
+      return (
+        <View style={styles.cardContainer}>
+          <Text style={styles.title}>Nome do artigo: {"\n\n"+item.title}</Text>
+          <Star score={item.total_events} style={styles.starStyle} />
+        </View>
+      );
+  };
 
   render() {
     const { data } = this.state;
@@ -36,9 +54,11 @@ export default class PopularScreen extends Component {
           source={require("../assets/bg.png")}
           style={{ flex: 1 }}
         >
-          {/* Adicione o componente FlatList aqui para mostrar a lista de artigos*/}
-       
-       
+          <FlatList
+            data={data}
+            keyExtractor={this.keyExtractor}
+            renderItem={this.renderItems}
+          />
         </ImageBackground>
       </View>
     );
